@@ -24,13 +24,14 @@ function CreatePossessionPage() {
       valeurConstante: parseFloat(valeurConstante),
     };
 
-    fetch('http://localhost:5000/possession', {
-      method: 'POST',
-      headers: {
+    fetch('http://localhost:5000/possession/create', {
+    method: 'POST',
+    headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newPossession),
-    })
+    },
+    body: JSON.stringify(newPossession),
+})
+
       .then((response) => {
         if (!response.ok) {
           throw new Error('Erreur réseau');

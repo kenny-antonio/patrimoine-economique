@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json()); // Ajoutez ceci pour permettre le traitement des corps de requêtes JSON
+app.use(express.json()); 
 
 const patrimoineData = {
     model: 'Patrimoine',
@@ -54,7 +54,20 @@ const patrimoineData = {
 app.get('/api/patrimoine', (req, res) => {
     res.json(patrimoineData);
 });
-app.post('/possession/create')
+app.post('/possession/create', (req, res) => {
+    const patrimoine = patrimoineData.data.possessions[0];
+    if (!patrimoine || !patrimoine.data || !patrimoine.data.possessions) {
+        return res.status(404).json({ message: 'Patrimoine non trouvé' });
+    }
+
+    const newPossession = req.body;
+    patrimoine.data.possessions.push(newPossession);
+    // saveData(); // Assurez-vous que cette fonction est définie quelque part
+
+    res.status(201).json(newPossession);
+});
+
+
 app.get('/api/chart-data', (req, res) => {
     const dateFin = new Date(req.query.dateFin);
 
@@ -81,17 +94,25 @@ app.get('/possession/:libelle', (req, res) => {
 
 app.put('/possession/:libelle', (req, res) => {
     const libelle = req.params.libelle;
-    const { dateFin } = req.body;
+    const { possesseur, libelle: newLibelle, valeur, dateDebut, dateFin, tauxAmortissement } = req.body;
 
     let possession = patrimoineData.data.possessions[0].data.possessions.find(p => p.libelle === libelle);
     
     if (possession) {
+        // Mettre à jour les valeurs
+        possession.possesseur = possesseur;
+        possession.libelle = newLibelle;
+        possession.valeur = valeur;
+        possession.dateDebut = dateDebut;
         possession.dateFin = dateFin;
+        possession.tauxAmortissement = tauxAmortissement;
+
         res.status(200).json(possession); // Renvoie la possession mise à jour en JSON
     } else {
         res.status(404).json({ error: 'Possession non trouvée' }); // Renvoie une erreur 404 si non trouvée
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

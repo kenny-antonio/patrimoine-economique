@@ -81,7 +81,6 @@ function PossessionPage() {
       .then(() => setPossessions(possessions.filter(p => p.libelle !== libelle)))
       .catch(error => console.error('Erreur lors de la fermeture de la possession:', error));
   };
-
   return (
     <Container className="mt-5">
       <Row className="justify-content-center mb-4">
@@ -121,19 +120,19 @@ function PossessionPage() {
               ) : (
                 possessions.map((item, index) => (
                   <tr key={index}>
-                    <td>{item.possesseur}</td>
-                    <td>{item.libelle}</td>
-                    <td>{getValeurInitiale(item).toFixed(2)} €</td>
-                    <td>{item.getValeur(selectedDate).toFixed(2)} €</td>
-                    <td>{item.dateDebut.toLocaleDateString()}</td>
-                    <td>{item.dateFin ? item.dateFin.toLocaleDateString() : 'Non définie'}</td>
-                    <td>{item.tauxAmortissement} %</td>
-                    <td>
-                      <Link to={`/possession/${item.libelle}/update`} className="btn btn-warning me-2">Modifier</Link>
-                      <Button variant="danger" onClick={() => closePossession(item.libelle)}>Fermer</Button>
-                    </td>
+                      <td>{item.possesseur}</td>
+                      <td>{item.libelle}</td>
+                      <td>{getValeurInitiale(item).toFixed(2)} €</td>
+                      <td>{item.getValeur(selectedDate).toFixed(2)} €</td>
+                      <td>{new Date(item.dateDebut).toLocaleDateString()}</td>
+                      <td>{item.dateFin ? new Date(item.dateFin).toLocaleDateString() : 'Non définie'}</td>
+                      <td>{item.tauxAmortissement} %</td>
+                      <td>
+                          <Link to={`/possession/${item.libelle}/update`} className="btn btn-warning me-2">Modifier</Link>
+                          <Button variant="danger" onClick={() => closePossession(item.libelle)}>Fermer</Button>
+                      </td>
                   </tr>
-                ))
+              ))
               )}
             </tbody>
           </Table>

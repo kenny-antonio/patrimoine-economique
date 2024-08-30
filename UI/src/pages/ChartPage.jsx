@@ -42,9 +42,31 @@ function ChartPage() {
   };
 
   const updateChartData = () => {
-    // Exemple de données pour le graphique
-    const labels = ['Date 1', 'Date 2', 'Date 3']; // Remplacez par des labels dynamiques
-    const values = [10, 20, 30]; // Remplacez par des valeurs dynamiques
+    const labels = [];
+    const values = [];
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const selected = new Date(selectedDate);
+
+    const daysBetween = (end - start) / (1000 * 60 * 60 * 24);
+    const selectedDayIndex = (selected - start) / (1000 * 60 * 60 * 24);
+
+    for (let i = 0; i <= daysBetween; i++) {
+      const currentDate = new Date(start);
+      currentDate.setDate(start.getDate() + i);
+      labels.push(currentDate.toISOString().split('T')[0]); // Format YYYY-MM-DD
+
+      // Modélisation d'une courbe : montée, pic, puis descente vers la fin
+      let value;
+      if (i <= selectedDayIndex) {
+        value = 10 + i * 3; // Croissance initiale jusqu'à la date sélectionnée
+      } else {
+        value = 10 + selectedDayIndex * 3 - (i - selectedDayIndex) * 2; // Descente après la date sélectionnée
+      }
+
+      values.push(value);
+    }
 
     const data = {
       labels: labels,
@@ -52,10 +74,12 @@ function ChartPage() {
         {
           label: 'Valeur des Possessions',
           data: values,
-          backgroundColor: 'rgb(75, 192, 192)', // Couleur verte
-          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)', // Couleur verte avec transparence pour remplir sous la courbe
+          borderColor: 'rgb(75, 192, 192)', // Couleur verte pour la ligne
           borderWidth: 2,
-          fill: false, // Ne pas remplir sous la ligne
+          fill: false, // Ne pas remplir sous la courbe
+          tension: 0.4, // Arrondir la ligne pour créer une courbe
+          pointRadius: 0, // Désactiver les points
         },
       ],
     };
@@ -130,7 +154,6 @@ function ChartPage() {
           <Line
             data={chartData}
             options={{
-              indexAxis: 'y', // Affichage horizontal
               scales: {
                 x: {
                   beginAtZero: true,
