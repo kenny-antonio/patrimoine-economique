@@ -4,13 +4,14 @@ import 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import './ChartPage.css'; // Importation du fichier CSS
 
 function ChartPage() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [chartData, setChartData] = useState({});
-  const [showChart, setShowChart] = useState(false);
+  const [step, setStep] = useState(1); // Étape du processus
 
   const handleStartDateChange = (date) => {
     setStartDate(date);
@@ -26,10 +27,7 @@ function ChartPage() {
 
   const handleValidateStartEndDates = () => {
     if (startDate && endDate && startDate <= endDate) {
-      console.log('Dates sélectionnées :', startDate, endDate);
-      // Mettre à jour les données du graphique en fonction des dates sélectionnées
-      updateChartData();
-      setShowChart(true);
+      setStep(2); // Passer à l'étape suivante
     } else {
       alert('Veuillez sélectionner des dates valides.');
     }
@@ -37,10 +35,7 @@ function ChartPage() {
 
   const handleValidateSelectedDate = () => {
     if (selectedDate && startDate && endDate && selectedDate >= startDate && selectedDate <= endDate) {
-      console.log('Date sélectionnée :', selectedDate);
-      // Mettre à jour les données du graphique en fonction de la date sélectionnée
       updateChartData();
-      setShowChart(true);
     } else {
       alert('Veuillez sélectionner une date valide.');
     }
@@ -48,7 +43,6 @@ function ChartPage() {
 
   const updateChartData = () => {
     // Exemple de données pour le graphique
-    // Remplacez ces données par des données basées sur les dates sélectionnées
     const labels = ['Date 1', 'Date 2', 'Date 3']; // Remplacez par des labels dynamiques
     const values = [10, 20, 30]; // Remplacez par des valeurs dynamiques
 
@@ -58,11 +52,12 @@ function ChartPage() {
         {
           label: 'Valeur des Possessions',
           data: values,
-          fill: false,
+          backgroundColor: 'rgb(75, 192, 192)', // Couleur verte
           borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
-        }
-      ]
+          borderWidth: 2,
+          fill: false, // Ne pas remplir sous la ligne
+        },
+      ],
     };
 
     setChartData(data);
@@ -73,57 +68,77 @@ function ChartPage() {
       <h2 className="text-center mb-4">Graphique des Possessions</h2>
 
       <div className="mb-4">
-        <div className="form-group">
-          <label>Date de Début :</label>
-          <DatePicker
-            selected={startDate}
-            onChange={handleStartDateChange}
-            selectsStart
-            startDate={startDate}
-            endDate={endDate}
-            dateFormat="yyyy/MM/dd"
-            className="form-control"
-          />
+        <div className="row">
+          <div className="col-md-6">
+            <div className="form-group">
+              <label>Date de Début :</label>
+              <DatePicker
+                selected={startDate}
+                onChange={handleStartDateChange}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                dateFormat="yyyy/MM/dd"
+                className="form-control"
+              />
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="form-group">
+              <label>Date de Fin :</label>
+              <DatePicker
+                selected={endDate}
+                onChange={handleEndDateChange}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                minDate={startDate}
+                dateFormat="yyyy/MM/dd"
+                className="form-control"
+              />
+            </div>
+          </div>
         </div>
-        <div className="form-group mt-2">
-          <label>Date de Fin :</label>
-          <DatePicker
-            selected={endDate}
-            onChange={handleEndDateChange}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            minDate={startDate}
-            dateFormat="yyyy/MM/dd"
-            className="form-control"
-          />
-        </div>
-        <button className="btn btn-primary mt-3" onClick={handleValidateStartEndDates}>
-          Valider Dates Début/Fin
-        </button>
+        {step === 1 && (
+          <button className="btn btn-primary mt-3" onClick={handleValidateStartEndDates}>
+            Valider Dates Début/Fin
+          </button>
+        )}
       </div>
 
-      <div className="mb-4">
-        <div className="form-group">
-          <label>Date Sélectionnée :</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleSelectedDateChange}
-            minDate={startDate}
-            maxDate={endDate}
-            dateFormat="yyyy/MM/dd"
-            className="form-control"
+      {step === 2 && (
+        <div className="mb-4">
+          <div className="form-group">
+            <label>Date Sélectionnée :</label>
+            <DatePicker
+              selected={selectedDate}
+              onChange={handleSelectedDateChange}
+              minDate={startDate}
+              maxDate={endDate}
+              dateFormat="yyyy/MM/dd"
+              className="form-control"
+            />
+          </div>
+          <button className="btn btn-primary mt-3" onClick={handleValidateSelectedDate}>
+            Valider Date Sélectionnée
+          </button>
+        </div>
+      )}
+
+      {chartData.labels && (
+        <div className="chart-container">
+          <Line
+            data={chartData}
+            options={{
+              indexAxis: 'y', // Affichage horizontal
+              scales: {
+                x: {
+                  beginAtZero: true,
+                },
+              },
+            }}
           />
         </div>
-        <button className="btn btn-primary mt-3" onClick={handleValidateSelectedDate}>
-          Valider Date Sélectionnée
-        </button>
-      </div>
-
-      {showChart && (
-        <div>
-          <Line data={chartData} />
-        </div> 
       )}
     </div>
   );

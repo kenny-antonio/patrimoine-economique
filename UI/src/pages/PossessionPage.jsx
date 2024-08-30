@@ -86,15 +86,6 @@ function PossessionPage() {
     <Container className="mt-5">
       <Row className="justify-content-center mb-4">
         <Col md={8} className="text-center">
-          <Link to="/possession/create" className="btn btn-primary mb-3">Créer une possession</Link>
-          <Link to="/possession/:libelle/update" className="btn btn-warning mb-3">Mettre à jour les possessions</Link>
-          <Link to="/chart" className="btn btn-secondary mb-3">Voir le Graphique</Link>
-          <Link to="/patrimoine" className="btn btn-tertiaire mb-3">Patrimoine</Link>
-        </Col>
-      </Row>
-
-      <Row className="justify-content-center mb-4">
-        <Col md={8} className="text-center">
           <h2>PATRIMOINE ECONOMIQUE</h2>
         </Col>
       </Row>

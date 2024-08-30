@@ -1,79 +1,116 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreatePossessionPage.css'; // Importez votre fichier CSS
+import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 function CreatePossessionPage() {
-  const navigate = useNavigate();
+  const [possesseur, setPossesseur] = useState('');
   const [libelle, setLibelle] = useState('');
   const [valeur, setValeur] = useState('');
-  const [dateDebut, setDateDebut] = useState('');
-  const [taux, setTaux] = useState('');
+  const [dateDebut, setDateDebut] = useState(new Date());
+  const [tauxAmortissement, setTauxAmortissement] = useState('');
+  const [valeurConstante, setValeurConstante] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const createPossession = () => {
-    const newPossession = { libelle, valeur, dateDebut, taux };
-    fetch('/possession', {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const newPossession = {
+      possesseur,
+      libelle,
+      valeur: parseFloat(valeur),
+      dateDebut,
+      tauxAmortissement: parseFloat(tauxAmortissement),
+      valeurConstante: parseFloat(valeurConstante),
+    };
+
+    fetch('http://localhost:5000/possession', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newPossession)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newPossession),
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erreur lors de la création de la possession');
-      }
-      return response.text();
-    })
-    .then(() => navigate('/possession'))
-    .catch(error => console.error('Erreur:', error));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erreur réseau');
+        }
+        return response.json();
+      })
+      .then(() => {
+        // Rediriger vers la page des possessions après l'ajout
+        navigate('/');
+      })
+      .catch((error) => {
+        console.error('Erreur lors de l\'ajout de la possession:', error);
+        setError('Impossible d\'ajouter la possession.');
+      });
   };
 
   return (
-    <div className="container">
-      <h1 className="title">Créer une Possession</h1>
-      <div className="form-group">
-        <label htmlFor="libelle">Libelle</label>
-        <input 
-          id="libelle"
-          type="text" 
-          className="input" 
-          placeholder="Libelle" 
-          value={libelle} 
-          onChange={(e) => setLibelle(e.target.value)} 
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="valeur">Valeur</label>
-        <input 
-          id="valeur"
-          type="number" 
-          className="input" 
-          placeholder="Valeur" 
-          value={valeur} 
-          onChange={(e) => setValeur(e.target.value)} 
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="dateDebut">Date de Début</label>
-        <input 
-          id="dateDebut"
-          type="date" 
-          className="input" 
-          value={dateDebut} 
-          onChange={(e) => setDateDebut(e.target.value)} 
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="taux">Taux</label>
-        <input 
-          id="taux"
-          type="number" 
-          className="input" 
-          placeholder="Taux" 
-          value={taux} 
-          onChange={(e) => setTaux(e.target.value)} 
-        />
-      </div>
-      <button className="button" onClick={createPossession}>Créer</button>
-    </div>
+    <Container className="mt-5">
+      <Row className="justify-content-center mb-4">
+        <Col md={6}>
+          <h2>Ajouter une nouvelle possession</h2>
+          {error && <div className="alert alert-danger">{error}</div>}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Possesseur</Form.Label>
+              <Form.Control
+                type="text"
+                value={possesseur}
+                onChange={(e) => setPossesseur(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Libellé</Form.Label>
+              <Form.Control
+                type="text"
+                value={libelle}
+                onChange={(e) => setLibelle(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Valeur</Form.Label>
+              <Form.Control
+                type="number"
+                value={valeur}
+                onChange={(e) => setValeur(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Date de début</Form.Label>
+              <Form.Control
+                type="date"
+                value={dateDebut.toISOString().substr(0, 10)}
+                onChange={(e) => setDateDebut(new Date(e.target.value))}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Taux d'Amortissement (%)</Form.Label>
+              <Form.Control
+                type="number"
+                value={tauxAmortissement}
+                onChange={(e) => setTauxAmortissement(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Valeur Constante</Form.Label>
+              <Form.Control
+                type="number"
+                value={valeurConstante}
+                onChange={(e) => setValeurConstante(e.target.value)}
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">Ajouter</Button>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

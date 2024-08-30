@@ -54,7 +54,7 @@ const patrimoineData = {
 app.get('/api/patrimoine', (req, res) => {
     res.json(patrimoineData);
 });
-
+app.post('/possession/create')
 app.get('/api/chart-data', (req, res) => {
     const dateFin = new Date(req.query.dateFin);
 
@@ -63,7 +63,9 @@ app.get('/api/chart-data', (req, res) => {
     
     res.json({labels, values});
 });
-
+app.get('/possession',(req,res)=>{
+    res.json(patrimoineData.data.possessions);
+})
 app.get('/possession/:libelle', (req, res) => {
     const libelle = req.params.libelle;
     

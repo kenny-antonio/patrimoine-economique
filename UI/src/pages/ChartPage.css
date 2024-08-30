@@ -1,0 +1,6 @@
+.chart-container {
+    width: 80%; /* Ajuster la largeur en pourcentage ou en pixels */
+    margin: 0 auto; /* Centrer le conteneur */
+    max-width: 800px; /* Limiter la largeur maximale si nécessaire */
+  }
+  
