@@ -20,9 +20,7 @@ function PossessionPage() {
         return response.json();
       })
       .then(data => {
-        // Assurez-vous que la structure de données est correcte
         const possessionsData = data.data.possessions[0].data.possessions;
-
         const loadedPossessions = possessionsData.map(possession =>
           new Possession(
             possession.possesseur.nom,
@@ -77,10 +75,33 @@ function PossessionPage() {
   };
 
   const closePossession = (libelle) => {
+    console.log('Tentative de clôturer la possession:', libelle);
+  
     fetch(`/possession/${libelle}/close`, { method: 'PUT' })
-      .then(() => setPossessions(possessions.filter(p => p.libelle !== libelle)))
-      .catch(error => console.error('Erreur lors de la fermeture de la possession:', error));
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erreur lors de la clôture de la possession');
+        }
+        return response.json();
+      })
+      .then(() => {
+        console.log('Possession clôturée avec succès');
+        setPossessions(possessions.filter(p => p.libelle !== libelle));
+      })
+      .catch(error => {
+        console.error('Erreur lors de la fermeture de la possession:', error);
+      });
   };
+  
+  
+  const deletePossession = (libelle) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette possession ?')) {
+      fetch(`/possession/${libelle}`, { method: 'DELETE' })
+        .then(() => setPossessions(possessions.filter(p => p.libelle !== libelle)))
+        .catch(error => console.error('Erreur lors de la suppression de la possession:', error));
+    }
+  };
+
   return (
     <Container className="mt-5">
       <Row className="justify-content-center mb-4">
@@ -120,19 +141,20 @@ function PossessionPage() {
               ) : (
                 possessions.map((item, index) => (
                   <tr key={index}>
-                      <td>{item.possesseur}</td>
-                      <td>{item.libelle}</td>
-                      <td>{getValeurInitiale(item).toFixed(2)} €</td>
-                      <td>{item.getValeur(selectedDate).toFixed(2)} €</td>
-                      <td>{new Date(item.dateDebut).toLocaleDateString()}</td>
-                      <td>{item.dateFin ? new Date(item.dateFin).toLocaleDateString() : 'Non définie'}</td>
-                      <td>{item.tauxAmortissement} %</td>
-                      <td>
-                          <Link to={`/possession/${item.libelle}/update`} className="btn btn-warning me-2">Modifier</Link>
-                          <Button variant="danger" onClick={() => closePossession(item.libelle)}>Fermer</Button>
-                      </td>
+                    <td>{item.possesseur}</td>
+                    <td>{item.libelle}</td>
+                    <td>{getValeurInitiale(item).toFixed(2)} €</td>
+                    <td>{item.getValeur(selectedDate).toFixed(2)} €</td>
+                    <td>{new Date(item.dateDebut).toLocaleDateString()}</td>
+                    <td>{item.dateFin ? new Date(item.dateFin).toLocaleDateString() : 'Non définie'}</td>
+                    <td>{item.tauxAmortissement} %</td>
+                    <td>
+                      <Link to={`/possession/${item.libelle}/update`} className="btn btn-warning me-2">Modifier</Link>
+                      <Button type="button" variant="danger" onClick={() => closePossession(item.libelle)}>Clôturer</Button>
+                      <Button variant="danger" onClick={() => deletePossession(item.libelle)} className="ms-2">Supprimer</Button>
+                    </td>
                   </tr>
-              ))
+                ))
               )}
             </tbody>
           </Table>

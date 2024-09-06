@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json()); 
+app.use(express.json());
 
 const patrimoineData = {
     model: 'Patrimoine',
@@ -19,30 +19,54 @@ const patrimoineData = {
                         {
                             "possesseur": { "nom": "John Doe" },
                             "libelle": "MacBook Pro",
-                            "valeur": 4000000,
+                            "valeur": 4300000,
                             "dateDebut": "2023-12-25T00:00:00.000Z",
                             "dateFin": null,
                             "tauxAmortissement": 5
                         },
                         {
                             "possesseur": { "nom": "John Doe" },
-                            "libelle": "Alternance",
+                            "libelle": "Compte épargne",
                             "valeur": 500000,
-                            "dateDebut": "2022-12-31T21:00:00.000Z",
+                            "dateDebut": "2019-01-06T00:00:00.000Z",
                             "dateFin": null,
-                            "tauxAmortissement": null,
+                            "tauxAmortissement": -5
+                        },
+                        {
+                            "possesseur": { "nom": "John Doe" },
+                            "libelle": "Clothes",
+                            "valeur": 2000000,
+                            "dateDebut": "2020-01-01T00:00:00.000Z",
+                            "dateFin": null,
+                            "tauxAmortissement": 10
+                        },
+                        {
+                            "possesseur": { "nom": "John Doe" },
+                            "libelle": "Alternance",
+                            "valeur": 600000,
+                            "dateDebut": "2023-02-13T00:00:00.000Z",
+                            "dateFin": null,
+                            "tauxAmortissement": 0,
                             "jour": 1,
-                            "valeurConstante": 500000
+                            "valeurConstante": 600000
                         },
                         {
                             "possesseur": { "nom": "John Doe" },
                             "libelle": "Survie",
-                            "valeur": -300000,
-                            "dateDebut": "2022-12-31T21:00:00.000Z",
+                            "valeur": 300000,
+                            "dateDebut": "2023-02-13T00:00:00.000Z",
                             "dateFin": null,
-                            "tauxAmortissement": null,
+                            "tauxAmortissement": 0,
                             "jour": 2,
                             "valeurConstante": -300000
+                        },
+                        {
+                            "possesseur": { "nom": "John Doe" },
+                            "libelle": "Redmi Note 9",
+                            "valeur": 800000,
+                            "dateDebut": "2022-12-29T00:00:00.000Z",
+                            "dateFin": null,
+                            "tauxAmortissement": 15
                         }
                     ]
                 }
@@ -54,6 +78,7 @@ const patrimoineData = {
 app.get('/api/patrimoine', (req, res) => {
     res.json(patrimoineData);
 });
+
 app.post('/possession/create', (req, res) => {
     const patrimoine = patrimoineData.data.possessions[0];
     if (!patrimoine || !patrimoine.data || !patrimoine.data.possessions) {
@@ -62,33 +87,47 @@ app.post('/possession/create', (req, res) => {
 
     const newPossession = req.body;
     patrimoine.data.possessions.push(newPossession);
-    // saveData(); // Assurez-vous que cette fonction est définie quelque part
 
     res.status(201).json(newPossession);
 });
 
 
-app.get('/api/chart-data', (req, res) => {
-    const dateFin = new Date(req.query.dateFin);
 
-    const labels = [];
-    const values = [];
-    
-    res.json({labels, values});
-});
-app.get('/possession',(req,res)=>{
+app.get('/possession', (req, res) => {
     res.json(patrimoineData.data.possessions);
-})
+});
+
 app.get('/possession/:libelle', (req, res) => {
     const libelle = req.params.libelle;
-    
-    // Cherchez la possession correspondante
     const possession = patrimoineData.data.possessions[0].data.possessions.find(p => p.libelle === libelle);
-    
     if (possession) {
-        res.json(possession); // Renvoie la possession trouvée en JSON
+        res.json(possession);
     } else {
-        res.status(404).json({ error: 'Possession non trouvée' }); // Renvoie une erreur 404 si non trouvée
+        res.status(404).json({ error: 'Possession non trouvée' });
+    }
+});
+
+app.put('/possession/:libelle/close', (req, res) => {
+    const libelle = req.params.libelle;
+    const possession = patrimoineData.data.possessions[0].data.possessions.find(p => p.libelle === libelle);
+
+    if (possession) {
+        possession.dateFin = new Date();
+        res.status(200).json(possession);
+    } else {
+        res.status(404).json({ error: 'Possession non trouvée' });
+    }
+});
+
+app.delete('/possession/:libelle', (req, res) => {
+    const libelle = req.params.libelle;
+    const index = patrimoineData.data.possessions[0].data.possessions.findIndex(p => p.libelle === libelle);
+
+    if (index !== -1) {
+        patrimoineData.data.possessions[0].data.possessions.splice(index, 1);
+        res.status(200).json({ message: 'Possession supprimée avec succès' });
+    } else {
+        res.status(404).json({ error: 'Possession non trouvée' });
     }
 });
 
@@ -97,9 +136,8 @@ app.put('/possession/:libelle', (req, res) => {
     const { possesseur, libelle: newLibelle, valeur, dateDebut, dateFin, tauxAmortissement } = req.body;
 
     let possession = patrimoineData.data.possessions[0].data.possessions.find(p => p.libelle === libelle);
-    
+
     if (possession) {
-        // Mettre à jour les valeurs
         possession.possesseur = possesseur;
         possession.libelle = newLibelle;
         possession.valeur = valeur;
@@ -107,13 +145,14 @@ app.put('/possession/:libelle', (req, res) => {
         possession.dateFin = dateFin;
         possession.tauxAmortissement = tauxAmortissement;
 
-        res.status(200).json(possession); // Renvoie la possession mise à jour en JSON
+        res.status(200).json(possession);
     } else {
-        res.status(404).json({ error: 'Possession non trouvée' }); // Renvoie une erreur 404 si non trouvée
+        res.status(404).json({ error: 'Possession non trouvée' });
     }
 });
 
 
+
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port:${PORT}`);
 });

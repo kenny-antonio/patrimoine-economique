@@ -8,7 +8,6 @@ function CreatePossessionPage() {
   const [valeur, setValeur] = useState('');
   const [dateDebut, setDateDebut] = useState(new Date());
   const [tauxAmortissement, setTauxAmortissement] = useState('');
-  const [valeurConstante, setValeurConstante] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -21,17 +20,15 @@ function CreatePossessionPage() {
       valeur: parseFloat(valeur),
       dateDebut,
       tauxAmortissement: parseFloat(tauxAmortissement),
-      valeurConstante: parseFloat(valeurConstante),
     };
 
     fetch('http://localhost:5000/possession/create', {
-    method: 'POST',
-    headers: {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(newPossession),
-})
-
+      },
+      body: JSON.stringify(newPossession),
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Erreur réseau');
@@ -97,14 +94,7 @@ function CreatePossessionPage() {
                 type="number"
                 value={tauxAmortissement}
                 onChange={(e) => setTauxAmortissement(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Valeur Constante</Form.Label>
-              <Form.Control
-                type="number"
-                value={valeurConstante}
-                onChange={(e) => setValeurConstante(e.target.value)}
+                required
               />
             </Form.Group>
             <Button variant="primary" type="submit">Ajouter</Button>
