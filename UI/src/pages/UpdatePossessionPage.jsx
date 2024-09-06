@@ -51,7 +51,7 @@ function UpdatePossessionPage() {
       tauxAmortissement: parseFloat(tauxAmortissement),
     };
 
-    fetch(`http://localhost:5000/possession/${libelle}`, {
+    fetch(`https://patrimoine-economique-ux65.onrender.com/possession/${libelle}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

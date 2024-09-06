@@ -22,7 +22,7 @@ function CreatePossessionPage() {
       tauxAmortissement: parseFloat(tauxAmortissement),
     };
 
-    fetch('http://localhost:5000/possession/create', {
+    fetch('https://patrimoine-economique-ux65.onrender.com/possession/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
