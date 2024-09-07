@@ -12,7 +12,7 @@ function PossessionPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('https://patrimoine-economique-ux65.onrender.com/possession')
+    fetch('https://patrimoine-economique-ux65.onrender.com/api/patrimoine')
       .then(response => {
         if (!response.ok) {
           throw new Error('Erreur réseau');
