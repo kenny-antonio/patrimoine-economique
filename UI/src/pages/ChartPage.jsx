@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Chart } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2'; // Utilisation correcte du composant "Line"
 import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip } from 'chart.js';
 import './ChartPage.css';
 
@@ -106,7 +106,7 @@ const ChartPage = () => {
       </Row>
       <Row className="justify-content-center mt-4">
         <Col md={12} className="chart-container">
-          <Chart type='line' data={data} options={options} />
+          <Line data={data} options={options} /> {/* Utilisation du composant Line */}
         </Col>
       </Row>
     </Container>
